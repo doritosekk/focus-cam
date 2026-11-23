@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusCam</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-state="idle" data-alarm="off">
+  <div class="bg-glow"></div>
+  <div class="hazard-bar top"></div>
+  <div class="hazard-bar bottom"></div>
+  <div class="alert-overlay"></div>
+
+  <main class="app">
+    <header>
+      <h1>Focus<span>Cam</span></h1>
+      <p>Operator attention monitor</p>
+    </header>
+
+    <section class="stage">
+      <div class="cam-ring" id="camRing">
+        <div id="webcam-container" class="cam-inner">
+          <div class="placeholder" id="placeholder">Camera off</div>
+        </div>
+      </div>
+
+      <div class="status-pill" id="statusPill">
+        <span class="dot"></span>
+        <span id="statusText">System standby</span>
+      </div>
+
+      <div class="meter">
+        <div class="meter-top">
+          <span>Focus score</span>
+          <strong id="scoreText">0%</strong>
+        </div>
+        <div class="meter-track"><div class="meter-fill" id="scoreFill"></div></div>
+      </div>
+
+      <div class="controls">
+        <button id="toggleBtn" class="btn primary" type="button">Start</button>
+        <label class="switch">
+          <input type="checkbox" id="soundToggle" checked />
+          <span>Alert sound</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="card"><small>Session</small><strong id="sessionTime">00:00</strong></div>
+      <div class="card"><small>Focused</small><strong id="focusTime">00:00</strong></div>
+      <div class="card"><small>Streak</small><strong id="streak">00:00</strong></div>
+      <div class="card"><small>Best streak</small><strong id="bestStreak">00:00</strong></div>
+      <div class="card"><small>Distractions</small><strong id="distractions">0</strong></div>
+    </section>
+
+    <section class="predictions">
+      <h2>Model output</h2>
+      <div id="label-container"></div>
+    </section>
+  </main>
+
+  <!-- 1) TensorFlow + Teachable Machine libs (must load BEFORE app.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+
+  <!-- 2) Your own JS file, loaded last -->
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+:root {
+  --bg: #0b0d14;
+  --card: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #eef0f7;
+  --muted: #8b90a5;
+  --good: #3ddc97;
+  --bad: #ff2a3d;
+  --idle: #ffc400;
+  --accent: var(--idle);
+}
+
+body[data-state="focused"]    { --accent: var(--good); }
+body[data-state="distracted"] { --accent: var(--bad); }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px 60px;
+}
+
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(600px circle at 50% 25%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%);
+  transition: background 0.6s;
+  pointer-events: none;
+}
+
+.app { position: relative; width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 28px; }
+
+header { text-align: center; }
+header h1 { font-size: 2.2rem; letter-spacing: -0.03em; }
+header h1 span { color: var(--accent); transition: color 0.4s; }
+header p { color: var(--muted); margin-top: 4px; }
+
+.stage { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+/* webcam ring */
+.cam-ring {
+  padding: 6px;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent), transparent 60%, var(--accent));
+  box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: box-shadow 0.4s;
+}
+body[data-state="running"] .cam-ring,
+body[data-state="focused"] .cam-ring,
+body[data-state="distracted"] .cam-ring { animation: spin 6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.cam-inner {
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #11141f;
+  display: grid; place-items: center;
+  animation: none;
+}
+/* counter-rotate so video stays upright */
+body[data-state="running"] .cam-inner,
+body[data-state="focused"] .cam-inner,
+body[data-state="distracted"] .cam-inner { animation: spin-back 6s linear infinite; }
+@keyframes spin-back { to { transform: rotate(-360deg); } }
+.cam-inner canvas { width: 100%; height: 100%; object-fit: cover; }
+.placeholder { color: var(--muted); font-size: 0.9rem; }
+
+/* status */
+.status-pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  font-weight: 500;
+}
+.status-pill .dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  transition: background 0.3s;
+}
+body[data-state="distracted"] .status-pill { animation: shake 0.4s; }
+@keyframes shake {
+  25% { transform: translateX(-6px); } 75% { transform: translateX(6px); }
+}
+
+/* ===== SAFETY / HAZARD STYLE ===== */
+.hazard-bar {
+  position: fixed; left: 0; right: 0; height: 16px; z-index: 5;
+  background: repeating-linear-gradient(-45deg, #ffc400 0 16px, #111 16px 32px);
+}
+.hazard-bar.top { top: 0; }
+.hazard-bar.bottom { bottom: 0; }
+body[data-alarm="on"] .hazard-bar {
+  background: repeating-linear-gradient(-45deg, #ff2a3d 0 16px, #111 16px 32px);
+  animation: stripes 0.5s linear infinite;
+}
+@keyframes stripes { to { background-position: 45px 0; } }
+
+.alert-overlay {
+  position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: 0;
+  background: rgba(255, 42, 61, 0.14);
+  box-shadow: inset 0 0 0 10px #ff2a3d, inset 0 0 140px rgba(255, 42, 61, 0.7);
+}
+body[data-alarm="on"] .alert-overlay { animation: flash 0.6s steps(2, jump-none) infinite; }
+@keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.15; } 100% { opacity: 1; } }
+
+header h1 { text-transform: uppercase; letter-spacing: 0.02em; }
+header p { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.75rem; }
+
+.status-pill {
+  border-radius: 6px;
+  border: 3px solid var(--accent);
+  background: #111;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  padding: 12px 22px;
+}
+body[data-alarm="on"] .status-pill {
+  background: #ff2a3d; color: #fff; border-color: #fff;
+  animation: shake 0.3s infinite;
+}
+body[data-alarm="on"] .cam-ring { box-shadow: 0 0 70px #ff2a3d; }
+.btn { border-radius: 6px; text-transform: uppercase; letter-spacing: 0.1em; }
+.card { border-radius: 6px; border-left: 4px solid var(--accent); }
+
+/* meter */
+.meter { width: 100%; max-width: 380px; }
+.meter-top { display: flex; justify-content: space-between; color: var(--muted); margin-bottom: 8px; font-size: 0.9rem; }
+.meter-top strong { color: var(--text); }
+.meter-track { height: 10px; border-radius: 99px; background: var(--card); border: 1px solid var(--border); overflow: hidden; }
+.meter-fill { height: 100%; width: 0; border-radius: 99px; background: var(--accent); transition: width 0.3s, background 0.4s; }
+
+/* controls */
+.controls { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.btn {
+  font-family: inherit; font-size: 1rem; font-weight: 700;
+  padding: 12px 32px; border-radius: 12px; border: none; cursor: pointer;
+  transition: transform 0.15s, filter 0.2s;
+}
+.btn.primary { background: var(--accent); color: #0b0d14; }
+.btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+.btn:active { transform: translateY(0); }
+.switch { display: flex; align-items: center; gap: 8px; color: var(--muted); cursor: pointer; font-size: 0.9rem; }
+.switch input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.card small { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.card strong { font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+
+/* predictions */
+.predictions h2 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+.pred-row { margin-bottom: 12px; }
+.pred-row .top { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px; }
+.pred-row .track { height: 6px; background: var(--card); border-radius: 99px; overflow: hidden; }
+.pred-row .fill { height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width 0.15s; }
